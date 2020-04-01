@@ -1,0 +1,35 @@
+# serverless.yml
+
+service: scim-api
+
+plugins:
+    - serverless-python-requirements
+    - serverless-wsgi
+
+custom:
+    wsgi:
+        app: app.app
+        packRequirements: false
+    pythonRequirements:
+        dockerizePip: non-linux
+        slim: true
+    tableName: client_config
+
+provider:
+    name: aws
+    runtime: python3.7
+    stage: ${opt:stage, 'demo'}
+    region: us-east-2
+
+package:
+    exclude:
+        - ./**
+    include:
+        - app.py
+
+functions:
+    demoapp:
+        handler: wsgi_handler.handler
+        events:
+            - http: ANY /
+            - http: 'ANY {proxy+}'
